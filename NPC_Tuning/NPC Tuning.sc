@@ -1,3 +1,4 @@
+// ORIGINAL MOD: https://gist.github.com/JuniorDjjr/a68191d9f4b5fb642c7f658ca9c1b8bf
 // You need: https://forum.mixmods.com.br/f141-gta3script-cleo/t5206-como-criar-scripts-com-cleoplus
 SCRIPT_START
 {
@@ -5,49 +6,50 @@ SCRIPT_START
     LVAR_INT iFullTuningFinalPercent iLevels[5] bDisableNitro
 
     // Wheel sets
-    CONST_INT ANY_SET           -1
-    CONST_INT WHEEL_SET_TF      0   // Transfender
-    CONST_INT WHEEL_SET_WAA     1   // Wheel Arch Angel
-    CONST_INT WHEEL_SET_LLC     2   // Loco Low Co.
-    CONST_INT WHEEL_SET_MORE    3   // More...
+    CONST_INT ANY_SET         -1
+    CONST_INT WHEEL_SET_TF    0 // Transfender
+    CONST_INT WHEEL_SET_WAA   1 // Wheel Arch Angel
+    CONST_INT WHEEL_SET_LLC   2 // Loco Low Co.
+    CONST_INT WHEEL_SET_MORE  3 // More...
 
     // Upgrade types
-    CONST_INT UPGRADE_HOOD    				0
-    CONST_INT UPGRADE_VENT    				1
-    CONST_INT UPGRADE_SPOIL   				2
-    CONST_INT UPGRADE_SIDESKIRT				3
-    CONST_INT UPGRADE_BULLFRNT				4
-    CONST_INT UPGRADE_BULLREAR				5
-    CONST_INT UPGRADE_LIGHTS  				6
-    CONST_INT UPGRADE_ROOF    				7
-    CONST_INT UPGRADE_NITRO   				8
-    CONST_INT UPGRADE_HYDRAULICS			9
-    CONST_INT UPGRADE_STEREO  				10
-    CONST_INT UPGRADE_UNKNOWN  				11
-    CONST_INT UPGRADE_WHEELS  				12
-    CONST_INT UPGRADE_EXHAUST 				13
-    CONST_INT UPGRADE_BUMPFRNT				14
-    CONST_INT UPGRADE_BUMPREAR				15
-    CONST_INT UPGRADE_MISC					16
-    CONST_INT UPGRADE_ALLWHEELS             17
+    CONST_INT UPGRADE_HOOD        0
+    CONST_INT UPGRADE_VENT        1
+    CONST_INT UPGRADE_SPOIL       2
+    CONST_INT UPGRADE_SIDESKIRT   3
+    CONST_INT UPGRADE_BULLFRNT    4
+    CONST_INT UPGRADE_BULLREAR    5
+    CONST_INT UPGRADE_LIGHTS      6
+    CONST_INT UPGRADE_ROOF        7
+    CONST_INT UPGRADE_NITRO       8
+    CONST_INT UPGRADE_HYDRAULICS  9
+    CONST_INT UPGRADE_STEREO      10
+    CONST_INT UPGRADE_UNKNOWN     11
+    CONST_INT UPGRADE_WHEELS      12
+    CONST_INT UPGRADE_EXHAUST     13
+    CONST_INT UPGRADE_BUMPFRNT    14
+    CONST_INT UPGRADE_BUMPREAR    15
+    CONST_INT UPGRADE_MISC        16
+    CONST_INT UPGRADE_ALLWHEELS   17
 
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "Level1" (iLevels[0])
-        iLevels[0] = 25
+        iLevels[0] = 5
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "Level2" (iLevels[1])
-        iLevels[1] = 50
+        iLevels[1] = 10
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "Level3" (iLevels[2])
-        iLevels[1] = 75
+        iLevels[2] = 15
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "Level4" (iLevels[3])
-        iLevels[1] = 90
+        iLevels[3] = 20
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "Level5" (iLevels[4])
-        iLevels[1] = 95
+        iLevels[4] = 25
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "FullTuningFinalPercent" (iFullTuningFinalPercent)
-        iFullTuningFinalPercent = 60
+        // iFullTuningFinalPercent = 60
+        iFullTuningFinalPercent = 75
     ENDIF
     IF NOT READ_INT_FROM_INI_FILE "CLEO\NPC Tuning.ini" "Settings" "DisableNitro" (bDisableNitro)
         bDisableNitro = TRUE
@@ -136,7 +138,7 @@ SCRIPT_START
     OR iVehModel = MOWER
         RETURN
     ENDIF
-    
+
     // Init parts list
     bThisVehicleHasPartsInitialized = FALSE
 
@@ -150,7 +152,7 @@ SCRIPT_START
         ENDIF
     ENDIF
 
-    /*REPEAT 18 iType 
+    /*REPEAT 18 iType
         GOSUB InstallThisType
     ENDREPEAT
     RETURN*/
@@ -185,31 +187,47 @@ SCRIPT_START
 
     bUseFinalRandom = TRUE
 
-    IF iRandomLevel = 100 // full tuning
+    IF iRandomLevel > 75 // full tuning, DEFAULT: IF iRandomLevel = 100
     AND iFullTuningFinalPercent > 0
         IF bIsOffCity = FALSE
             IF iRandomLevel > iFullTuningFinalPercent
                 bUseFinalRandom = FALSE
-                REPEAT 18 iType 
+                REPEAT 18 iType
                     GOSUB InstallThisType
                 ENDREPEAT
-                IF IS_CAR_STREET_RACER hVeh
-                OR IS_CAR_LOW_RIDER hVeh
-                    GET_CURRENT_VEHICLE_PAINTJOB hVeh (i)
-                    IF i <= 0
-                        GET_NUM_AVAILABLE_PAINTJOBS hVeh (i)
-                        IF i > 0
-                            GENERATE_RANDOM_INT_IN_RANGE_WITH_SEED iSeed -3 i (i)
-                            IF i >= 0
-                                GIVE_VEHICLE_PAINTJOB hVeh i
-                            ENDIF
+                GET_CURRENT_VEHICLE_PAINTJOB hVeh (i)
+                IF i <= 0
+                    GET_NUM_AVAILABLE_PAINTJOBS hVeh (i)
+                    IF i > 0
+                        GENERATE_RANDOM_INT_IN_RANGE_WITH_SEED iSeed -1 i (i)
+                        IF i >= 0
+                            GIVE_VEHICLE_PAINTJOB hVeh i
                         ENDIF
                     ENDIF
-                    IF IS_CAR_LOW_RIDER hVeh
-                    AND NOT DOES_CAR_HAVE_HYDRAULICS hVeh
-                        SET_CAR_HYDRAULICS hVeh ON
-                    ENDIF
                 ENDIF
+                IF IS_CAR_LOW_RIDER hVeh
+                AND NOT DOES_CAR_HAVE_HYDRAULICS hVeh
+                    SET_CAR_HYDRAULICS hVeh ON
+                ENDIF
+
+                // Street cars / Low riders only version
+                // IF IS_CAR_STREET_RACER hVeh
+                // OR IS_CAR_LOW_RIDER hVeh
+                //     GET_CURRENT_VEHICLE_PAINTJOB hVeh (i)
+                //     IF i <= 0
+                //         GET_NUM_AVAILABLE_PAINTJOBS hVeh (i)
+                //         IF i > 0
+                //             GENERATE_RANDOM_INT_IN_RANGE_WITH_SEED iSeed -1 i (i)
+                //             IF i >= 0
+                //                 GIVE_VEHICLE_PAINTJOB hVeh i
+                //             ENDIF
+                //         ENDIF
+                //     ENDIF
+                //     IF IS_CAR_LOW_RIDER hVeh
+                //     AND NOT DOES_CAR_HAVE_HYDRAULICS hVeh
+                //         SET_CAR_HYDRAULICS hVeh ON
+                //     ENDIF
+                // ENDIF
             ENDIF
         ENDIF
         RETURN
@@ -252,13 +270,17 @@ SCRIPT_START
     IF iRandomLevel < iLevels[3]
         RETURN
     ENDIF
-    IF bIsOffCity = TRUE
-        iType = UPGRADE_LIGHTS
-        GOSUB InstallThisType
-    ELSE
-        iType = UPGRADE_SPOIL
-        GOSUB InstallThisType
-    ENDIF
+    iType = UPGRADE_LIGHTS
+    GOSUB InstallThisType
+    iType = UPGRADE_SPOIL
+    GOSUB InstallThisType
+    // IF bIsOffCity = TRUE
+    //     iType = UPGRADE_LIGHTS
+    //     GOSUB InstallThisType
+    // ELSE
+    //     iType = UPGRADE_SPOIL
+    //     GOSUB InstallThisType
+    // ENDIF
 
     IF iRandomLevel < iLevels[4]
         RETURN
@@ -387,7 +409,7 @@ SCRIPT_END
 {
     LVAR_INT nVehModelID // In
     LVAR_INT i nModel nVehModType pVehModelInfo pVehMods pLabel nMemorySlot offset value
-    
+
     StoreAllUpgradesToCar:
     REPEAT 18 i
         IF NOT i = UPGRADE_WHEELS
@@ -402,7 +424,7 @@ SCRIPT_END
 
     REPEAT 18 i
         READ_MEMORY pVehMods 2 FALSE (nModel)
-        IF nModel = 0xFFFF 
+        IF nModel = 0xFFFF
             BREAK
         ENDIF
 
@@ -677,12 +699,12 @@ FF FF FF FF
 ENDDUMP
 
 TMemory_WHEELS: //hardcoded
-DUMP 
+DUMP
 00 00
 ENDDUMP
 
 TMemory_ALLWHEELS: //hardcoded
-DUMP 
+DUMP
 00 01
 ENDDUMP
 
